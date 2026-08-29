@@ -8,12 +8,19 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: gedar-rss-update
+  cancel-in-progress: false
+
 jobs:
   update-feed:
     runs-on: ubuntu-latest
+
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -31,10 +38,18 @@ jobs:
         run: |
           git config user.name "gedar-rss-bot"
           git config user.email "actions@users.noreply.github.com"
+
           git add feed.xml state.json
+
           if git diff --cached --quiet; then
             echo "No hay cambios."
-          else
-            git commit -m "Actualizar RSS de Gedar"
-            git push
+            exit 0
           fi
+
+          git commit -m "Actualizar RSS de Gedar"
+
+          # Si la rama cambió mientras corría el workflow, integra esos cambios
+          # antes de intentar publicar el feed.
+          git pull --rebase origin main
+          git push origin main
+          
