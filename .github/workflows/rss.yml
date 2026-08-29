@@ -1,0 +1,40 @@
+name: Actualizar RSS de Gedar
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-feed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Generar RSS
+        run: python gedar_rss.py
+
+      - name: Guardar feed actualizado
+        run: |
+          git config user.name "gedar-rss-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add feed.xml state.json
+          if git diff --cached --quiet; then
+            echo "No hay cambios."
+          else
+            git commit -m "Actualizar RSS de Gedar"
+            git push
+          fi
