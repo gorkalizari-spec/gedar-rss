@@ -11,7 +11,7 @@ GitHub Actions ejecuta el generador dos veces por hora. El RSS resultante queda 
 
 URL final:
 
-`https://raw.githubusercontent.com/TU_USUARIO/gedar-rss/main/feed.xml`
+`https://raw.githubusercontent.com/gorkalizari-spec/gedar-rss/main/feed.xml`
 
 Primera ejecución:
 
